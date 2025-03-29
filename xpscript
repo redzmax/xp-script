@@ -1,0 +1,184 @@
+
+loadstring(game:HttpGet('https://raw.githubusercontent.com/redzmax/redzblack/refs/heads/main/redzblack'))()
+-- اسم القائمه والمفتاح حق سكربت
+MakeWindow({
+    Hub = {
+      Title = "Xp Script",
+      Animation = "By : axl_games"
+    },
+    Key = {
+      KeySystem = false,
+      Title = "ez HUB",
+      Description = "",
+      KeyLink = "e",
+      Keys = {"1"},
+      Notifi = {
+        Notifications = true,
+        CorrectKey = "Key is Correct wait(..)",
+        Incorrectkey = "The key is incorrect",
+        CopyKeyLink = "Copied to Clipboard"
+      }
+    }
+  })
+  -- زر يقفل القائمه ويفتح قائمه
+  MinimizeButton({
+    Image = "rbxassetid://",
+    Size = {55, 55},
+    Color = Color3.fromRGB(10, 10, 10),
+    Corner = true,
+    Stroke = false,
+    StrokeColor = Color3.fromRGB(255, 0, 0)
+  })
+  --قائمه
+  local Main4 = MakeTab({Name = "script"})
+  local section = AddSection(Main4, {"Test"})
+  SetSection(section, "By axl_games")
+  --زر
+  AddButton(Main4, {
+    Name = "headless",
+    Callback = function()
+      game.Players.localPlayer.Character.Head.Size = Vector3.new(0,0,0)
+    end
+    })
+
+
+
+
+    local targetPlayerName = ""
+
+ -- textbox
+    AddTextBox(Main4, {
+      Name = "Player Name",
+      Default = "Player name",
+      PlaceholderText = "Player name",
+      ClearText = true,
+      Callback = function(value)
+        targetPlayerName = value
+      end
+    })
+    
+-- زر
+    AddButton(Main4, {
+        Name = "Teleport to Player",
+        Callback = function()
+            local player = game.Players.LocalPlayer
+            local targetPlayer = nil
+    
+
+            for _, p in pairs(game.Players:GetPlayers()) do
+                if string.find(string.lower(p.Name), string.lower(targetPlayerName)) then
+                    targetPlayer = p
+                    break
+                end
+            end
+    
+            if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                player.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+            else
+                warn("Player not found or player does not have a HumanoidRootPart")
+            end
+        end
+    })
+
+-- زر
+    AddButton(Main4, {
+        Name = "Teleport to Player",
+        Callback = function()
+            local player = game.Players.LocalPlayer
+            local targetPlayer = nil
+    
+
+            for _, p in pairs(game.Players:GetPlayers()) do
+                if string.find(string.lower(p.Name), string.lower(targetPlayerName)) then
+                    targetPlayer = p
+                    break
+                end
+            end
+    
+            if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                player.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+            else
+                warn("Player not found or player does not have a HumanoidRootPart")
+            end
+        end
+    })
+           
+            -- Function to start flying
+            local function startFlying()
+                bodyGyro = Instance.new("BodyGyro")
+                bodyGyro.P = 9e4
+                bodyGyro.Parent = rootPart
+                bodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+                bodyGyro.CFrame = rootPart.CFrame
+            
+                bodyVelocity = Instance.new("BodyVelocity")
+                bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+                bodyVelocity.Parent = rootPart
+                bodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+            
+                humanoid.PlatformStand = true
+            
+                game:GetService("RunService").RenderStepped:Connect(function()
+                    if flying then
+                        local camera = workspace.CurrentCamera
+                        local moveDirection = Vector3.new()
+            
+                        if userInputService:IsKeyDown(Enum.KeyCode.W) then
+                            moveDirection = moveDirection + camera.CFrame.LookVector
+                        end
+                        if userInputService:IsKeyDown(Enum.KeyCode.S) then
+                            moveDirection = moveDirection - camera.CFrame.LookVector
+                        end
+                        if userInputService:IsKeyDown(Enum.KeyCode.A) then
+                            moveDirection = moveDirection - camera.CFrame.RightVector
+                        end
+                        if userInputService:IsKeyDown(Enum.KeyCode.D) then
+                            moveDirection = moveDirection + camera.CFrame.RightVector
+                        end
+                        if userInputService:IsKeyDown(Enum.KeyCode.Space) then
+                            moveDirection = moveDirection + camera.CFrame.UpVector
+                        end
+                        if userInputService:IsKeyDown(Enum.KeyCode.LeftShift) then
+                            moveDirection = moveDirection - camera.CFrame.UpVector
+                        end
+            
+                        bodyGyro.CFrame = camera.CFrame
+                        bodyVelocity.Velocity = moveDirection * flySpeed
+                    end
+                end)
+            end
+            
+            -- Function to stop flying
+            local function stopFlying()
+                if bodyGyro then bodyGyro:Destroy() end
+                if bodyVelocity then bodyVelocity:Destroy() end
+                humanoid.PlatformStand = false
+            end
+            -- Toggle button to enable/disable flying
+            -- Toggle button function
+                AddToggle(Main4, {
+                Name = "Fly",
+                CurrentValue = false,
+                Flag = "OnFly", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+                Callback = function(Value)
+                    flying = Value
+                    if flying then
+                        startFlying()
+                    else
+                        stopFlying()
+                    end
+                end,
+            })
+            --خط سرعه
+            -- Slider to set fly speed
+            AddSlider(Main4, {
+                Name = "Fly Speed",
+                Range = {0, 1000},
+                Increment = 1,
+                Suffix = "Speed",
+                CurrentValue = 100,
+                Flag = "FlySpeed", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+                Callback = function(Value)
+                    flySpeed = Value
+                end,
+            })
